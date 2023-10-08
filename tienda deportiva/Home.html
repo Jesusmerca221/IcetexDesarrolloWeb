@@ -4,78 +4,168 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda en Línea</title>
-    <!-- Enlace a Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <!-- Enlace a tu archivo CSS personalizado (ajusta la ruta según sea necesario) -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">Total Sport</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Perfil
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Ver perfil</a>
-                        <a class="dropdown-item" href="#">Editar perfil</a>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Carrito</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Historial de compras</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Configuración</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Cerrar sesión</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
     <div id="contenedorHome" class="container mt-4">
         <h1>Bienvenido, [Nombre de Usuario]</h1>
-        <div class="row">
-            <!-- Sección de productos (puedes utilizar Bootstrap cards para mostrar productos) -->
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <img src="producto1.jpg" class="card-img-top" alt="Producto 1">
-                    <div class="card-body">
-                        <h5 class="card-title">Producto 1</h5>
-                        <p class="card-text">Descripción del producto 1.</p>
-                        <a href="#" class="btn btn-primary">Comprar</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Repite este bloque para más productos -->
+        
+        <!-- Sección de productos (utilizando Bootstrap cards) -->
+        <div class="row" id="productos-container">
+            <!-- Los productos se cargarán dinámicamente aquí -->
         </div>
+        
         <form class="mt-4">
             <div class="form-group">
                 <input type="text" class="form-control" placeholder="Buscar productos">
             </div>
             <button type="submit" class="btn btn-primary">Buscar</button>
         </form>
+
+        <!-- Sección del carrito -->
+        <div id="carrito" class="mt-4">
+            <h2>Carrito de compras</h2>
+            <ul id="lista-carrito" class="list-group">
+                <!-- Aquí se mostrarán los productos agregados al carrito -->
+            </ul>
+            <p>Total: $<span id="total-carrito">0.00</span></p>
+            <button id="comprar" class="btn btn-success">Comprar</button>
+        </div>
     </div>
+    
 
-    <footer class="bg-dark text-light text-center py-2 mt-4">
-        <!-- Pie de página -->
-        © 2023 Total Sport
-    </footer>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var carrito = [];
+            var productos = [
+                { nombre: 'Sueter deportivo hombre', precio: 50000, descripcion: 'Sueter Deportivo hombre, disponible en todas las tallas y colores', imagen: 'sueter_hombre.jpg', cantidadDisponible: 10 },
+                { nombre: 'Blusa deportiva mujer', precio: 50000, descripcion: 'Blusa Deportiva mujer, disponible en todas las tallas y colores', imagen: 'blusa_deportiva.jpg', cantidadDisponible: 10 },
+                { nombre: 'Conjunto deportivo hombre', precio: 70000, descripcion: 'Conjunto deportivo hombre, disponible en todas las tallas y colores', imagen: 'conjunto_hombre.jpg', cantidadDisponible: 10 },
+                { nombre: 'Conjunto deportivo mujer', precio: 70000, descripcion: 'Conjunto deportivo mujer, disponible en todas las tallas y colores', imagen: 'conjunto_mujer.jpg', cantidadDisponible: 10 },
+            ];
 
-    <!-- Enlace a Bootstrap JS (jQuery es necesario para Bootstrap) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+            cargarProductos();
+
+            function cargarProductos() {
+                var productosContainer = document.getElementById('productos-container');
+
+                productos.forEach(function(producto) {
+                    var productoHtml = `
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <img src="${producto.imagen}" class="card-img-top" alt="${producto.nombre}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${producto.nombre}</h5>
+                                    <p class="card-text">${producto.descripcion}</p>
+                                    <p class="card-text">Precio: $${producto.precio.toFixed(2)}</p>
+                                    <p class="card-text">Disponibles: <span id="disponibles-${producto.nombre}">${producto.cantidadDisponible}</span></p>
+                                    <a href="#" class="btn btn-primary agregar-al-carrito" data-nombre="${producto.nombre}" data-precio="${producto.precio}" data-disponible="${producto.cantidadDisponible}">Agregar al carrito</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    productosContainer.innerHTML += productoHtml;
+                });
+
+                // Agregar el evento click para agregar al carrito
+                var agregarAlCarritoButtons = document.getElementsByClassName('agregar-al-carrito');
+                for (var i = 0; i < agregarAlCarritoButtons.length; i++) {
+                    agregarAlCarritoButtons[i].addEventListener('click', function() {
+                        var nombre = this.getAttribute('data-nombre');
+                        var precio = parseFloat(this.getAttribute('data-precio'));
+
+                        // Obtener la cantidad disponible actual
+                        var cantidadDisponible = parseInt(document.getElementById(`disponibles-${nombre}`).innerText);
+
+                        if (cantidadDisponible > 0) {
+                            // Verificar si el producto ya está en el carrito
+                            var productoEnCarrito = carrito.find(function(item) {
+                                return item.nombre === nombre;
+                            });
+
+                            if (productoEnCarrito) {
+                                productoEnCarrito.cantidad += 1;
+                            } else {
+                                carrito.push({ nombre: nombre, precio: precio, cantidad: 1 });
+                            }
+
+                            // Reducir la cantidad disponible
+                            document.getElementById(`disponibles-${nombre}`).innerText = cantidadDisponible - 1;
+                            mostrarCarrito();
+                        } else {
+                            alert('No hay suficiente cantidad disponible.');
+                        }
+                    });
+                }
+            }
+
+            function mostrarCarrito(){
+                var listaCarrito = document.getElementById('lista-carrito');
+                var totalCarrito = document.getElementById('total-carrito');
+                listaCarrito.innerHTML = '';
+
+                var total = 0;
+
+                for(var i = 0; i < carrito.length; i++){
+                    var listItem = document.createElement('li');
+                    listItem.className = 'list-group-item';
+                    listItem.textContent = carrito[i].nombre + ' x' + carrito[i].cantidad + ' - $' + (carrito[i].precio * carrito[i].cantidad).toFixed(2);
+
+                    // Agregar botón para eliminar producto del carrito
+                    var eliminarButton = document.createElement('button');
+                    eliminarButton.className = 'btn btn-danger eliminar-del-carrito';
+                    eliminarButton.textContent = 'Eliminar';
+                    eliminarButton.setAttribute('data-indice', i);
+                    listItem.appendChild(eliminarButton);
+
+                    // Agregar evento click para eliminar producto del carrito
+                    eliminarButton.addEventListener('click', function() {
+                        var indice = parseInt(this.getAttribute('data-indice'));
+                        var producto = carrito[indice];
+
+                        // Aumentar la cantidad disponible al eliminar
+                        var cantidadDisponible = parseInt(document.getElementById(`disponibles-${producto.nombre}`).innerText);
+                        document.getElementById(`disponibles-${producto.nombre}`).innerText = cantidadDisponible + producto.cantidad;
+
+                        // Eliminar el producto del carrito
+                        carrito.splice(indice, 1);
+                        mostrarCarrito();
+                    });
+
+                    listaCarrito.appendChild(listItem);
+
+                    total += carrito[i].precio * carrito[i].cantidad;
+                }
+
+                totalCarrito.textContent = total.toFixed(2);
+            }
+
+            // Agregar evento para el botón "Comprar"
+            var comprarButton = document.getElementById('comprar');
+            comprarButton.addEventListener('click', function() {
+                // Simular una compra satisfactoria
+                alert('¡Compra satisfactoria! Gracias por tu compra.');
+
+                // Aquí puedes implementar la lógica para finalizar la compra, como redirigir a un formulario de pago.
+                // Por ahora, simplemente vaciaremos el carrito.
+                carrito.forEach(function(item) {
+                    // Aumentar la cantidad disponible al comprar
+                    var producto = productos.find(function(producto) {
+                        return producto.nombre === item.nombre;
+                    });
+
+                    if (producto) {
+                        producto.cantidadDisponible += item.cantidad;
+                    }
+                });
+
+                carrito = [];
+                mostrarCarrito();
+            });
+        });
+    </script>
+    
 </body>
 </html>
-
 
